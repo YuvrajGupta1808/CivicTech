@@ -27,17 +27,27 @@ def _norm_key(s: pd.Series) -> pd.Series:
 
 
 def _clean_features(X: pd.DataFrame) -> pd.DataFrame:
-    """Make X safe for HistGradientBoosting (object/bool -> category/float; huge categoricals -> codes)."""
+    """Make X safe for HistGradientBoosting.
+
+    bool -> float; object/string -> category; every categorical column -> integer-coded categories (pandas-3 `str`
+    categories containing NA break sklearn's from_dtype). Codes are consistent across folds because X is sliced from
+    one table. Categoricals with > 250 levels become plain float codes (HGB allows <= 255 categories).
+    """
     X = X.copy()
     for c in X.columns:
         dt = X[c].dtype
         if dt == bool or str(dt) == "boolean":
             X[c] = X[c].astype(float)
-        elif dt == object or str(dt) in ("string", "str"):
+            continue
+        if dt == object or str(dt) in ("string", "str"):
             X[c] = X[c].astype("category")
-        if isinstance(X[c].dtype, pd.CategoricalDtype) and len(X[c].cat.categories) > MAX_CATEGORIES:
-            print(f"[run_cv] WARNING: {c} has {len(X[c].cat.categories)} categories; using integer codes")
-            X[c] = X[c].cat.codes.replace(-1, np.nan).astype(float)
+        if isinstance(X[c].dtype, pd.CategoricalDtype):
+            codes = X[c].cat.codes
+            if len(X[c].cat.categories) > MAX_CATEGORIES:
+                print(f"[run_cv] WARNING: {c} has {len(X[c].cat.categories)} categories; using float codes")
+                X[c] = codes.where(codes >= 0).astype(float)
+            else:
+                X[c] = pd.Categorical(codes.where(codes >= 0))
     return X
 
 
@@ -70,7 +80,7 @@ def _decode_all(Pv: np.ndarray, yv: np.ndarray, Pt: np.ndarray, step: float):
 
 
 def run_cv(table: pd.DataFrame, feature_cols: list, label_col: str = "level", cfg: dict | None = None,
-           models=("m0", "m1", "spf", "gbm", "fusion"), external: dict | None = None,
+           models=("m0", "m1", "spf", "gbm", "fusion", "fusion_equal", "fusion_valsel"), external: dict | None = None,
            count_col: str = "crash_count") -> tuple[pd.DataFrame, pd.DataFrame]:
     """Leave-one-ward-out CV. Returns (metrics_df, oof_df).
 
@@ -98,7 +108,8 @@ def run_cv(table: pd.DataFrame, feature_cols: list, label_col: str = "level", cf
     need_gbm = "gbm" in models or bool(want_fusion)
     lts_level = None
     if "m1" in models:
-        lts_level = lts_from_raw(table)
+        # precomputed LTS (1..4) if the table carries it, else compute from the raw_<FIELD> passthrough columns
+        lts_level = table["ref_lts"].astype(int) if "ref_lts" in table.columns else lts_from_raw(table)
     report = [m for m in models if m not in ("m0", "m1")] + list(external)  # probabilistic models reported
     fusion_weights = cfg["fusion"]["weights_with_xattn"] if "xattn" in external else cfg["fusion"]["weights"]
 

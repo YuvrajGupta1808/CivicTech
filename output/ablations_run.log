@@ -1,0 +1,3 @@
+[abl] 19554 sub-blocks, 57 features (57 in groups), runs=['e10', 'e11', 'e5', 'e6'], gbm fits=3, jobs=6, OMP_NUM_THREADS=2
+[abl] block-level: 13068 blocks (longest sub-block's features; 490 NaN-key sub-blocks dropped)
+[abl] E11: dropping 100 weak_match rows
