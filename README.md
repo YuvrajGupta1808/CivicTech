@@ -219,6 +219,24 @@ BNA and LTS agree on 81% of sub-blocks (79% of km). Most of the disagreement is 
 
 Most of the gap (top-10% capture rises from 18% to 36%) comes from combining **the same four facts LTS already uses**, but weighted by crash data instead of by comfort rules. Re-learning only LTS's final 1-4 level barely helps (18% to 20%), because squeezing a street into 4 boxes throws the detail away. Junction geometry and the other facts add the rest (36% to 41%, and 44% for the fusion). So yes, learning from crashes is the main reason. LTS's inputs carry crash information; its rule just combines them for a different purpose (comfort).
 
+**Head to head: is there any slice where LTS or BNA beat the model?** (`scripts/11_head_to_head.py`, `output/head_to_head.csv`). Not on crash location. The model's AUC is higher in all 8 wards (0.73–0.81 against 0.53–0.74) and for every street type. **Within the same road type, LTS and BNA are close to a coin flip at telling crash blocks from crash-free ones:**
+
+| Street type | Sub-blocks | AUC, model | AUC, LTS | AUC, BNA |
+|---|---|---|---|---|
+| Local streets (FHWA 7) | 12,179 | 0.68 | 0.49 | 0.52 |
+| Collectors (FHWA 5–6) | 2,805 | 0.67 | 0.47 | 0.57 |
+| Arterials (FHWA 3–4) | 4,303 | 0.71 | 0.47 | 0.49 |
+| With a bike facility | 2,154 | 0.73 | 0.53 | 0.49 |
+
+At the **same flag rate** the model also catches more repeat-crash blocks. LTS 4 covers 31% of blocks and contains 59% of the 2+ crash blocks; the model's top 31% contains 88%. BNA stress 3 covers 36% of blocks and contains 72%; the model's top 36% contains 91%.
+
+**Where LTS and BNA are still better than this model:**
+- **Comfort.** They answer "would a nervous rider feel OK here?", and this model cannot. A stressful arterial that riders avoid records few crashes, so the model rates it low. 29% of the "LTS stressful, model low" blocks are arterials.
+- **No dependence on crash reporting.** The model inherits gaps in police reports and in crash-to-street matching (Wards 7–8 lose about a fifth of located crashes). LTS and BNA do not.
+- **Coverage and portability.** BNA can score OSM-only segments and both rules run in any city without training. This model needs a DDOT match (1,399 segments unscored) and DC crash history.
+- **Transparency.** They are short rule tables anyone can audit. The model is a learned ensemble; only the SPF member has readable coefficients.
+- **Risk of the wrong message.** 34% of the blocks the model puts at level 2 are LTS 1–2 streets, often bike routes. Shown alone as "danger", the model could steer riders away from good infrastructure. It should sit next to LTS, not replace it.
+
 **Per ward:**
 
 | Test ward | Sub-blocks | Level-2 | Macro-F1 | AUC any | Top-10% capture |
@@ -290,6 +308,7 @@ python scripts/05_xattn.py                     # M4, E7, E8 (GPU env; writes out
 .venv/bin/python scripts/08_lts_disagreement.py  # LTS vs model disagreement map + interactive risk_map.html
 .venv/bin/python scripts/09_architecture_figure.py  # docs/architecture.png
 .venv/bin/python scripts/10_lts_inputs_test.py   # fairness check: LTS inputs re-weighted by crashes
+.venv/bin/python scripts/11_head_to_head.py       # model vs LTS vs BNA per ward, street type, equal flag rate
 
 .venv/bin/python -m pytest -q
 ```
