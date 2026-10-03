@@ -6,25 +6,23 @@ Two slides in the shared deck (Models section). Two minutes, one presenter. Lead
 
 ## Part A: what to say (about 2 minutes)
 
-### Slide 1 (about 60 s)
+### Slide 1: question and what we built (about 60 s)
 
-> RideScore colours every DC street green to red from its design, using LTS and BNA. Nobody had checked those colours against where cyclists actually crash. So we asked: does street design explain where DC cyclists crash?
+> RideScore colours every DC street by its design, using LTS and BNA. Nobody had checked those colours against where cyclists actually crash. So we asked: does street design explain where DC cyclists crash?
 >
-> We had five hypotheses, on the left. The main one: design predicts crash locations, but only modestly.
+> Here's what we built, left to right. We joined 3,089 police-reported bike crashes from Open Data DC to 19,554 DDOT street blocks, and built 57 design facts from OpenStreetMap and DDOT.
 >
-> Here's what we built, left to right. We took the organisers' street snapshot, which joins OpenStreetMap and DDOT city records, plus 3,089 police-reported bike crashes from Open Data DC. We joined them by DDOT block ID into one table: 19,554 blocks, 57 design features, and how many crashes each block had in five years.
->
-> Three models learn from that table. One is the cross-attention model from our AVB-Engage research, where OpenStreetMap and DDOT read each other the way audio and video do in emotion recognition. We combine the three models, and we test only on wards the model never saw.
+> Three models learn from that table. One is the cross-attention model from our AVB-Engage research, where OpenStreetMap and DDOT read each other. We combine the three, and we test only on wards the model never saw.
 
-### Slide 2 (about 60 s)
+### Slide 2: findings and the map (about 60 s)
 
-> Here's the result. Take the 10% of blocks each score rates worst, in a ward the model never saw. Our model's 10% holds 44% of the bike crashes. LTS's holds 13%, BNA's 18%, and random gives 10%.
+> In wards the model never saw, the 10% of blocks it rates worst hold 44% of bike crashes. LTS's worst 10% hold 13%, BNA's 18%, and random gives 10%.
 >
-> That doesn't mean LTS is wrong. It measures comfort, and comfort isn't crash risk. LTS's calmest streets have the most crashes per kilometre, like 14th Street at Irving, with a protected lane and 18 crashes in five years, because that's where people ride.
+> The map shows where LTS and our model disagree. Orange streets are ones LTS calls calm but our model flags. They're 4% of the network but 15% of all bike crashes. The worst block, 14th Street at Irving, is LTS 1 with a protected lane and 18 crashes, because that's where people ride.
 >
-> Four of our five hypotheses held. One surprise: streets that look safe but have crashes are mostly mid-block, not at intersections.
->
-> We have scores for every street segment, maps, and code on GitHub. Next: show a crash layer next to LTS, add bike counts so we can separate busy from dangerous, and fix the Ward 7 and 8 crash-matching gap. Honest limit: without ridership data this shows where crashes happen, not how dangerous one ride is. Thank you.
+> So LTS measures comfort, not crash risk. Next: show a crash layer next to LTS, and add bike counts to separate busy from dangerous. Honest limit: without ridership data, this shows where crashes happen, not how dangerous one ride is. Thank you.
+
+The hypotheses (Part B) are no longer on the slides. Keep them for questions.
 
 ---
 
