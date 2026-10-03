@@ -51,6 +51,56 @@ Wording stays at association level throughout: "where recorded crashes happen".
 
 Crashes are never used as features. They give the label and nothing else.
 
+## How the data fits together (plain English)
+
+There are two separate steps. **Joining the data** puts each block's street facts and its crash count side by side. **Fusing OSM and DDOT inside the model** is where the cross-attention happens. Crash data is never mixed into the inputs: it is only the answer key.
+
+### Step 1: joining the data
+
+**a) OSM + DDOT (done by the organisers' snapshot).** Each OpenStreetMap street piece (28,978) was matched to the DDOT block it runs along: within 10 m and pointing the same way (within 25°). Each piece carries both descriptions, its OSM tags (bike lane, one-way, speed if mapped) and its DDOT record (lanes, speed limit, traffic, pavement), plus the DDOT block ID `dc_subblockkey`. 93% matched well, 2% weakly, and 5% (1,399 pieces) did not match and cannot be scored.
+
+**b) We regroup the pieces into DDOT blocks.** Several OSM pieces often sit on one DDOT block, so we group them by block ID: 19,554 blocks, one row each.
+- **DDOT facts** are identical for every piece in a block (checked), so we take them directly.
+- **OSM facts** can differ piece to piece, so we summarise them: the most common road type weighted by length, the highest speed, the best bike facility on any piece, and whether any piece is one-way.
+- **Separate bike tracks** mapped as their own line are left out of the road's facts, because they would copy the busy road beside them. They are recorded as a yes/no flag, "has a parallel bike track".
+
+**c) Crashes join by the same block ID.** Every crash record in Crashes in DC already carries the ID of the DDOT block where it was placed (`SUBBLOCKKEY`), the same ID the snapshot uses, so no distance-based guessing is needed. We download all bike-involved crashes from 2021-09-30 to 2026-09-29 (3,089), clean the IDs to the same text format on both sides, count crashes per block, and attach the count; blocks with no crashes get 0.
+- 2,742 crashes (89%) land on a block in the table.
+- 142 have no location ("Route not found").
+- 205 sit on blocks outside the snapshot, such as alleys and freeways.
+
+All 347 unmatched crashes are reported in `output/join_report.json`, not hidden.
+
+**d) The finished table.**
+
+| Block ID | 36 DDOT facts | 16 OSM facts | 7 layout facts | Crash count | Level |
+|---|---|---|---|---|---|
+| one row per DDOT block | lanes, speed, traffic, ... | bike lane, one-way, ... | junction legs, length, ... | 0, 1, 2, ... | 0 / 1 / 2+ |
+
+The layout facts come from how the street pieces connect: how many roads meet at each end, and how many junctions there are per 100 m. The model may only look at the fact columns. The crash count and level are the answers it is graded against, and it never sees them for the ward being tested.
+
+### Step 2: fusing OSM and DDOT inside the model
+
+This is the AVT-CA / AVB-Engage idea. In AVB-Engage, audio and video describe the same person. Here OSM and DDOT describe the same street, and they often disagree: OSM may show a bike lane that DDOT does not.
+- The transformer (M4) gets them as two groups of tokens: one token per fact, OSM in one group and DDOT in the other. The layout facts go into both groups.
+- Cross-attention lets each group look at the other and take what is useful. The OSM side can check DDOT's lane count; the DDOT side can check OSM's bike-lane detail. The model learns which source to trust instead of us hard-coding a rule.
+- During training, 15% of the time all of OSM or all of DDOT is hidden, so the model cannot lean on just one source.
+
+### Then: fusing the models' answers
+
+Three models each give the chance of 0, 1 or 2+ crashes for every block:
+- the transformer (M4)
+- gradient boosting (M3), which sees all facts in one flat list
+- the traffic-engineering formula (M2, the SPF)
+
+We average their answers 40% / 40% / 20%, turn the result into one score from 0 to 2, and apply the two cut-off points fitted on the validation wards.
+
+### Last step: back onto the street map
+
+Each of the 28,978 OSM street pieces takes the score of the DDOT block it belongs to. That is the hand-in file `output/crash_risk_by_segment.parquet`, keyed by `osm_u`, `osm_v`, `osm_key` as the organisers asked.
+
+**In one line:** the DDOT block ID is the glue. The organisers matched OSM to DDOT by location, crashes already carry the same ID, and inside the model the transformer lets OSM and DDOT read each other.
+
 ## Method
 
 ![architecture](docs/architecture.png)
