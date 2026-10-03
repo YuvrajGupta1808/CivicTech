@@ -1,0 +1,32 @@
+{
+  "n_crashes": 3089,
+  "n_sentinel": 142,
+  "n_matched_subblock": 2742,
+  "match_rate_all": 0.8876659112981548,
+  "match_rate_located": 0.9304377332880895,
+  "n_unmatched_located": 205,
+  "n_unmatched_distinct_keys": 157,
+  "n_unmatched_but_block_in_snapshot": 131,
+  "match_rate_by_ward": {
+    "Ward 1": 0.9681528662420382,
+    "Ward 2": 0.9476744186046512,
+    "Ward 3": 0.916030534351145,
+    "Ward 4": 0.9621212121212122,
+    "Ward 5": 0.9421487603305785,
+    "Ward 6": 0.9106239460370995,
+    "Ward 7": 0.8251748251748252,
+    "Ward 8": 0.7950819672131147
+  },
+  "label_counts": {
+    "0": 17826,
+    "1": 1203,
+    "2": 525
+  },
+  "n_subblocks": 19554,
+  "n_dropped_no_ward": 0,
+  "dropped_feature_cols": [
+    "ddot_curb_turn_len",
+    "osmf_width"
+  ],
+  "n_features": 57
+}

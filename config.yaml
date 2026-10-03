@@ -1,0 +1,61 @@
+paths:
+  data_dir: ~/ridescore-data
+  snapshot: ~/ridescore-data/ridescore_dc_basemap_2026-09-29.parquet
+  crashes_cache: ~/ridescore-data/crashes_bike_2021-09-30_2026-09-29.parquet
+  table: ~/ridescore-data/subblock_table.parquet
+  output_dir: output
+
+snapshot_date: "2026-09-29"
+crs_metric: "EPSG:26985"
+
+crashes:
+  api: https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Public_Safety_WebMercator/MapServer/24/query
+  window_start: "2021-09-30"   # inclusive
+  window_end: "2026-09-30"     # exclusive (window ends on snapshot date 2026-09-29)
+  page_size: 1000
+  primary_filter: "TOTAL_BICYCLES > 0"
+  sentinel: "Route not found"
+  fields: [OBJECTID, CRIMEID, REPORTDATE, SUBBLOCKKEY, BLOCKKEY, ROUTEID, TOTAL_BICYCLES,
+           MAJORINJURIES_BICYCLIST, MINORINJURIES_BICYCLIST, UNKNOWNINJURIES_BICYCLIST,
+           FATAL_BICYCLIST, OFFINTERSECTION, NEARESTINTKEY, NEARESTINTSTREETNAME, WARD,
+           LATITUDE, LONGITUDE, BICYCLISTSIMPAIRED, DRIVERSIMPAIRED, SPEEDING_INVOLVED]
+
+labels:
+  levels: [0, 1, 2]            # 0 = none, 1 = one, 2 = two or more
+  intersection_cutoff_m: 15    # OFFINTERSECTION is in metres; <= cutoff = intersection crash
+
+data_quality:
+  drop_match_status: [none]
+  min_primary_share: 0.5
+
+split:
+  scheme: leave_one_ward_out
+  n_val_wards: 2               # next 2 wards cyclically; wards 3 and 7 have only ~11 level-2 sub-blocks
+  seeds: [1, 2, 3]
+
+gbm:
+  max_leaf_nodes: 15
+  l2_regularization: 1.0
+  fits: [[0.05, 300], [0.03, 600], [0.05, 300]]
+  class_weight: inverse_sqrt
+
+xattn:
+  d_model: 32
+  heads: 4
+  exchanges: 2
+  dropout: 0.1
+  source_dropout: 0.15
+  ordinal_lambda: 0.15
+  label_smoothing: 0.1
+  lr: 1.0e-3
+  weight_decay: 0.05
+  batch_size: 256
+  max_epochs: 60
+
+fusion:
+  weights: {gbm: 0.67, spf: 0.33}
+  weights_with_xattn: {xattn: 0.4, gbm: 0.4, spf: 0.2}
+
+decode:
+  threshold_grid_step: 0.01
+  objective: macro_f1
