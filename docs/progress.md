@@ -15,6 +15,9 @@
 | Findings, maps, hand-in (G) | Sonnet | done | 176 looks-safe / 330 looks-risky; 28,978-row Parquet |
 | README + slides filled | Claude | done | no placeholders left |
 | Push to github.com/YuvrajGupta1808/CivicTech | Claude | done | public |
+| BNA comparison (bikescore-bna 0.2.0) | Sonnet | done | agrees with LTS on 81%; AUC 0.647 vs LTS 0.599 vs fusion 0.769 |
+| LTS vs model disagreement map + interactive risk_map.html | Sonnet | done | crash record sides with model in both cells |
+| Simplified architecture figure | Claude | done | docs/architecture.png / .svg, short Mermaid |
 | Submit repo link + paste 2 slides into demo deck | User | open | by 16:00 |
 
 ## Open items (next steps after the hackathon)

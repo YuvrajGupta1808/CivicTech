@@ -43,3 +43,6 @@
 - Production LTS v1 is computed once in `build.py` as `ref_lts` (a reference column, never a feature) using the `ridescore` package installed from git.
 - `OFFINTERSECTION` is in metres (checked against route measures); 15 m is the intersection cutoff for label variant B.
 - Ablations ran with `--fast` (first GBM fit only), so their "all features" base is 0.444, not the ladder's 3-fit 0.439.
+- BNA is computed with the team's `bikescore-bna` 0.2.0 (git 6a6cb494) segment-stress rules only (`default_segment_stress_rules()`); intersection stress needs the node graph and is not used. Inputs are DDOT first, then OSM, then BNA per-class defaults.
+- Binary scores (BNA, LTS-coarse) are compared with AUC and top-10% capture only; macro-F1 is not comparable to the 3-class models.
+- The LTS disagreement cells use LTS ≤ 2 vs ≥ 3 and fusion out-of-fold level 0 vs ≥ 1; in both disagreement cells the crash record sides with the model.

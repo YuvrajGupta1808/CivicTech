@@ -56,9 +56,7 @@ def build_frame(cfg):
     high = df["pred_thresholds"] >= 1
     df["cell"] = np.select(
         [calm & ~high, ~calm & high, calm & high, ~calm & ~high],
-        ["agree_low", "agree_high", "lts_calm_model_high", "lts_stressful_model_low"])
-    # NB: np.select order above is (calm, low)=agree_low, (stressful, high)=agree_high,
-    # (calm, high)=calm-but-model-high, (stressful, low)=stressful-but-model-low
+        ["agree_low", "agree_high", "lts_calm_model_high", "lts_stressful_model_low"], default="")
     df["any_bike_fac"] = (df["ddot_bike_best"].fillna(0) > 0) | (df["osmf_bike_best"].fillna(0) > 0)
     df["ddot_bike_fac"] = df["ddot_bike_best"].fillna(0) > 0
     return df
@@ -174,7 +172,7 @@ def web_map(g, out):
                              caption=f"Model crash-risk score (expected recorded-crash level 0-2; colours capped at {vmax:g})")
 
     def colour(s):
-        return "#cfcfcf" if pd.isna(s) else cmap(min(float(s), vmax))
+        return "#cfcfcf" if pd.isna(s) else cmap(min(float(s), vmax))[:7]
 
     lts_txt = {1: "1 (calmest)", 2: "2", 3: "3", 4: "4 (most stressful)"}
     lvl_txt = {0: "0 (low)", 1: "1 (medium)", 2: "2 (high)"}
@@ -201,8 +199,9 @@ def web_map(g, out):
                    "m": f"{lvl_txt[int(r.crash_risk_level)]}, score {r.crash_risk_score:.2f}",
                    "c": int(r.crash_count_5yr), "d": dis_txt[r.cell], "k": dis_col[r.cell]}
 
-    m = folium.Map(location=[38.9072, -77.0369], zoom_start=12, tiles=None, control_scale=True)
-    folium.TileLayer("CartoDB positron", attr=ATTR, name="Base map (CartoDB positron)").add_to(m)
+    m = folium.Map(location=[38.9072, -77.0369], zoom_start=12, tiles=None, control_scale=True, prefer_canvas=True)
+    folium.TileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", attr=ATTR,
+                     name="Base map (CartoDB positron)", subdomains="abcd", max_zoom=20).add_to(m)
 
     style = JsCode("function(f){return {color: f.properties.k, weight: 2, opacity: 0.9};}")
     dstyle = JsCode("function(f){return {color: f.properties.k, weight: 3.5, opacity: 0.95};}")
@@ -215,11 +214,11 @@ def web_map(g, out):
         sticky=True)
 
     fg1 = folium.FeatureGroup(name="Crash-model score by segment", show=True)
-    folium.GeoJson(feature_collection(gw, lambda d: list(score_props(d))), style_function=style, tooltip=tip,
+    folium.GeoJson(feature_collection(gw, lambda d: list(score_props(d))), style=style, tooltip=tip,
                    name="score").add_to(fg1)
     fg1.add_to(m)
     fg2 = folium.FeatureGroup(name="Where LTS and the crash model disagree", show=False)
-    folium.GeoJson(feature_collection(dis, lambda d: list(dis_props(d))), style_function=dstyle, tooltip=dtip,
+    folium.GeoJson(feature_collection(dis, lambda d: list(dis_props(d))), style=dstyle, tooltip=dtip,
                    name="disagreement").add_to(fg2)
     fg2.add_to(m)
     cmap.add_to(m)

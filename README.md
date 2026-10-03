@@ -12,6 +12,21 @@ RideScore DC colours every street by its design: speed limit, lanes, bike facili
 
 The scores are not a danger-per-ride measure. We have no exposure data (no counts of how many people ride where), so every result is about where recorded crashes happen.
 
+## What this covers in Challenge 1
+
+| Challenge item | Where |
+|---|---|
+| 4.3 Explore crash risk: which variables go with bike crashes | E1 ladder, E5 feature groups, M2 SPF coefficients |
+| 4.3 stretch: compare crash patterns with LTS and BNA | E2 (LTS by level), BNA vs LTS vs model table, disagreement map |
+| 4.3 stretch: intersections separately from segments | Mid-block-only label (E10), intersection-legs features, H5 test |
+| 4.3 stretch: spatial patterns | Per-ward results, risk map, surprise map (temporal not done) |
+| 4.3 stretch: variables existing models miss | Network geometry (junction legs and density) and pavement matter; LTS uses neither |
+| 4.2 Build a new bicycle-safety model | Ordinal SPF / GBM / OSM-DDOT cross-attention ladder with late fusion |
+| 4.2 stretch: compare with LTS / BNA; map where models disagree | `output/lts_disagreement_map.png`, `output/bna_compare.png` |
+| 4.2 stretch: behaviour by street type | Surprise breakdown by FHWA class and bike facility |
+| 4.2 stretch: visualization for the website | `output/risk_map.html` (interactive) and the per-segment Parquet keyed by `osm_u, osm_v, osm_key` |
+| Guide caveats | Missing `dc_*` handled natively (NaN-aware GBM, missing tokens in M4); separate cycle tracks excluded from road features and flagged; AADT-2020 noted |
+
 ## Question and hypotheses
 
 **Question:** how far do street-design attributes (OpenStreetMap plus DDOT Roadway SubBlock, via the RideScore DC basemap snapshot of 2026-09-29) explain where cyclist crashes happen in DC?
@@ -163,6 +178,33 @@ E11: dropping the 100 weak-match sub-blocks changes macro-F1 from 0.444 to 0.430
 
 LTS 1 is mostly protected tracks and trails, where riders concentrate. Without exposure data this reads as "crashes happen where people ride", not "protected lanes are unsafe".
 
+**Where LTS and the crash model disagree** (`scripts/08_lts_disagreement.py`). LTS is coarsened to calm (1–2) vs stressful (3–4). Our model's out-of-fold level is coarsened to low (0) vs high (≥ 1).
+
+| Cell | Sub-blocks | Share of network km | Crashes per km | Share with ≥ 1 crash |
+|---|---|---|---|---|
+| Both low | 10,564 | 48.7% | 0.67 | 4.3% |
+| Both high | 1,829 | 12.4% | 5.17 | 32.0% |
+| **LTS calm, model high** | 712 | 4.4% | **5.32** | 28.5% |
+| **LTS stressful, model low** | 6,449 | 34.5% | **1.07** | 7.5% |
+
+In both disagreement cells the crash record sides with the model. Blocks LTS calls calm but the model flags have the same crash rate as blocks both flag, and they hold 15% of all crashes on 4% of the network. Blocks LTS calls stressful but the model rates low look like the calm network. LTS measures comfort, not where crashes are recorded. The calm-but-flagged cell is 90% bike-facility streets, so exposure is part of the story.
+
+![LTS disagreement map](output/lts_disagreement_map.png)
+
+Interactive version for the RideScore website: `output/risk_map.html` (folium; risk score layer plus a toggleable disagreement layer; tooltips with street, LTS, model level, crashes). Download the file and open it in a browser.
+
+**BNA vs LTS vs our model** (`scripts/07_bna.py`). BNA segment stress comes from the team's `bikescore-bna` package (0.2.0, git 6a6cb494), using its packaged rule table `default_segment_stress_rules()`. Inputs are DDOT first, then OSM, then BNA's per-class defaults. Intersection stress is not used, because it needs the node graph. Following the guide, the comparison is coarse: BNA stress 1 vs 3, LTS ≤ 2 vs ≥ 3, and our level 0 vs ≥ 1.
+
+| Score | Crashes/km, comfortable or low | Crashes/km, uncomfortable or high | AUC any crash (held-out wards) | AUC 2+ crashes | Top-10% capture |
+|---|---|---|---|---|---|
+| BNA stress (1 vs 3) | 0.77 | 2.91 | 0.647 ± 0.060 | 0.683 | 0.182 |
+| LTS v1 coarse (≤ 2 vs ≥ 3) | 1.05 | 2.15 | 0.599 ± 0.052 | 0.634 | 0.130 |
+| Our fusion model (0 vs ≥ 1) | 0.83 | 5.21 | 0.769 ± 0.029 | 0.863 | 0.435 |
+
+BNA and LTS agree on 81% of sub-blocks (79% of km). Most of the disagreement is LTS-3 streets that BNA calls comfortable. As a crash-location signal BNA does slightly better than LTS, but both binary rule tables are far behind a model fitted to crashes. That is expected: they were designed to measure comfort, not to predict where crashes happen. Accuracy and macro-F1 are not comparable for the binary scores, so only ranking metrics are shown.
+
+![BNA vs LTS vs model](output/bna_compare.png)
+
 **Per ward:**
 
 | Test ward | Sub-blocks | Level-2 | Macro-F1 | AUC any | Top-10% capture |
@@ -218,8 +260,9 @@ Attribution (OSM, DDOT, MPD) is stored in the Parquet metadata.
 
 ```bash
 python3 -m venv .venv --system-site-packages     # reuses pandas, sklearn, pyarrow, torch, pytest from the base env
-.venv/bin/pip install geopandas statsmodels matplotlib pyyaml \
-  "ridescore @ git+https://github.com/civictechdc/ridescoredc-models@develop"
+.venv/bin/pip install geopandas statsmodels matplotlib pyyaml folium \
+  "ridescore @ git+https://github.com/civictechdc/ridescoredc-models@develop" \
+  "git+https://github.com/bright-fakl/bikescore-bna"
 
 # put the snapshot at ~/ridescore-data/ridescore_dc_basemap_2026-09-29.parquet (paths: config.yaml)
 
@@ -229,6 +272,9 @@ python3 -m venv .venv --system-site-packages     # reuses pandas, sklearn, pyarr
 .venv/bin/python scripts/04_findings.py        # surprise analysis, maps, hand-in Parquet
 python scripts/05_xattn.py                     # M4, E7, E8 (GPU env; writes output/xattn_probs.parquet)
 .venv/bin/python scripts/06_tables.py          # markdown tables -> output/tables.md
+.venv/bin/python scripts/07_bna.py             # BNA stress vs LTS vs model
+.venv/bin/python scripts/08_lts_disagreement.py  # LTS vs model disagreement map + interactive risk_map.html
+.venv/bin/python scripts/09_architecture_figure.py  # docs/architecture.png
 
 .venv/bin/python -m pytest -q
 ```

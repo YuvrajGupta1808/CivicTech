@@ -39,6 +39,10 @@ Two slides for the shared demo deck. All numbers come from `output/` (see README
 - Only 525 level-2 sub-blocks; Wards 3 and 7 have about 11 each.
 - AADT is a 2020 pandemic-year value; 4.8% of segments are unscored.
 
+**LTS, BNA and our model**
+- BNA (team package) vs LTS agree on 81% of blocks. As crash-location signals: BNA AUC 0.65, LTS 0.60, our model 0.77; crashes/km on "uncomfortable" streets: BNA 2.9, LTS 2.1, our high level 5.2 (`output/bna_compare.png`).
+- Where they disagree, the crash record sides with the model: "LTS calm, model high" blocks have 5.3 crashes/km (same as both-high, 5.2); "LTS stressful, model low" blocks have 1.1 (close to both-low, 0.7). Map: `output/lts_disagreement_map.png`; interactive: `output/risk_map.html`.
+
 **Next steps**
 - Add exposure: bike counts, bikeshare trips, ridership estimates.
 - Fix the Wards 7-8 crash-to-street gap.

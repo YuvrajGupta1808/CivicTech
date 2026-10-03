@@ -169,3 +169,4 @@ Meanwhile, Claude writes `features/build.py` and `scripts/01_build_dataset.py`, 
 - E7/E8: blanking DDOT costs more than blanking OSM; cross-attention ≈ concatenation.
 - H5 rejected: "looks safe, has crashes" sub-blocks are mostly mid-block.
 - Repo: https://github.com/YuvrajGupta1808/CivicTech (public). PR to ridescoredc-models was dropped by the user's decision.
+- Added after the first push (14:40–14:45): BNA comparison (`scripts/07_bna.py`), LTS disagreement map and interactive `output/risk_map.html` (`scripts/08_lts_disagreement.py`), simplified architecture figure (`scripts/09_architecture_figure.py`), and a challenge-coverage table in the README.

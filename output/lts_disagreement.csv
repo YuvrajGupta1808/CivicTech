@@ -1,0 +1,6 @@
+cell,label,n_subblocks,share_of_subblocks,km,share_of_network_km,observed_crashes,share_of_all_crashes,crashes_per_km,share_with_any_crash,share_level2,top_fhwa_classes,share_any_bike_facility,share_ddot_bike_facility,share_lts1,mean_model_score
+agree_low,"LTS calm, model low (agree)",10564,0.5402,853.1442,0.4871,567,0.2068,0.6646,0.0433,0.0071,7 (93%); 5 (4%); 4 (3%),0.1247,0.1037,0.0156,0.1359
+agree_high,"LTS stressful, model high (agree)",1829,0.0935,216.6888,0.1237,1121,0.4088,5.1733,0.3209,0.1356,3 (46%); 4 (43%); 5 (10%),0.2728,0.1389,0.0,0.7556
+lts_calm_model_high,"LTS calm, but model high",712,0.0364,76.8283,0.0439,409,0.1492,5.3236,0.2851,0.1419,4 (56%); 5 (21%); 7 (16%),0.8961,0.8806,0.3216,0.7814
+lts_stressful_model_low,"LTS stressful, but model low",6449,0.3298,604.9886,0.3454,645,0.2352,1.0661,0.0746,0.0157,7 (35%); 5 (29%); 4 (19%),0.1071,0.0276,0.0,0.2079
+all,All sub-blocks,19554,1.0,1751.65,1.0,2742,1.0,1.5654,0.0884,0.0268,7 (62%); 4 (14%); 5 (13%),0.1608,0.1102,0.0201,0.2411
