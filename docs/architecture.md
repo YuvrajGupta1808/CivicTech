@@ -1,6 +1,6 @@
 # Architecture
 
-Pipeline from the RideScore DC snapshot and the Crashes in DC layer to the hand-in Parquet. M4 is a stretch track and is fused in only if it finishes in time.
+Pipeline from the RideScore DC snapshot and the Crashes in DC layer to the hand-in Parquet. M4 landed in time and is part of the fusion (0.4 M4 + 0.4 M3 + 0.2 M2).
 
 ## Pipeline
 
@@ -25,11 +25,11 @@ flowchart TD
     FOLDS --> M1["M1 production LTS v1"]
     FOLDS --> M2["M2 negative-binomial SPF"]
     FOLDS --> M3["M3 gradient boosting<br/>weights 1/sqrt count"]
-    FOLDS -.-> M4["M4 OSM-DDOT cross-attention<br/>stretch"]
+    FOLDS --> M4["M4 OSM-DDOT cross-attention<br/>GPU, avtca env"]
 
-    M2 --> FUSE["F: fixed-weight late fusion<br/>0.67 M3 + 0.33 M2<br/>0.4 M4 + 0.4 M3 + 0.2 M2 if M4 lands"]
+    M2 --> FUSE["F: fixed-weight late fusion<br/>0.4 M4 + 0.4 M3 + 0.2 M2"]
     M3 --> FUSE
-    M4 -.-> FUSE
+    M4 --> FUSE
 
     M0 --> DEC["decode: expected level mu<br/>thresholds fitted on validation wards"]
     M1 --> DEC
@@ -71,7 +71,7 @@ Leakage guard: ward, coordinates and crash-derived values never enter `FEAT`; th
 | SPF | `src/models/spf.py` | M2: NB (Poisson fallback) with offset log(length), probabilities via pmf |
 | GBM | `src/models/gbm.py` | M3: histogram GBM, native missing values, inverse-sqrt weights, 3 fits averaged |
 | Fusion | `src/models/fusion.py` | `fuse(...)` and the weight grid for E9 |
-| Cross-attention | `src/models/xattn.py` | M4 stretch: tokeniser, OSM<->DDOT cross-attention, concat variant |
+| Cross-attention | `src/models/xattn.py` | M4: tokeniser, OSM<->DDOT cross-attention, concat variant |
 | Experiment runner | `src/experiments.py` | `run_cv(...)`: per-fold metrics and OOF predictions for all decoders |
 | Scripts | `scripts/01_build_dataset.py` to `05_xattn.py` | Build table; ladder (E1, E3, E9); ablations (E5, E6, E10, E11); findings and hand-in; M4 (E7, E8) |
 | Tests | `tests/test_labels.py`, `test_osm_parsing.py`, `test_decode.py`, `test_split.py` | Unit tests on synthetic tables |

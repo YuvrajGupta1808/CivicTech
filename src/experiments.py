@@ -6,6 +6,7 @@ import time
 
 import numpy as np
 import pandas as pd
+from threadpoolctl import threadpool_limits
 
 from src.config import load_config
 from src.decode import (apply_logit_bias, argmax, decode_thresholds, expected_level, fit_logit_bias,
@@ -19,6 +20,7 @@ from src.split import ward_folds
 
 DECODERS = ("argmax", "bias", "thresholds")
 FUSION_NAMES = ("fusion", "fusion_equal", "fusion_valsel")
+N_THREADS = 8
 MAX_CATEGORIES = 250  # HistGradientBoosting supports <= 255 categories per feature
 
 
@@ -131,13 +133,14 @@ def run_cv(table: pd.DataFrame, feature_cols: list, label_col: str = "level", cf
         else:
             spf_tag = "-"
         if need_gbm:
-            gb = fit_gbm(X.iloc[tr], y[tr], cfg, seed=0)
-            P["gbm"] = (gbm_proba(gb, X.iloc[va]), gbm_proba(gb, X.iloc[te]))
+            with threadpool_limits(limits=N_THREADS):  # cap OpenMP threads: oversubscription on shared CPUs is very slow
+                gb = fit_gbm(X.iloc[tr], y[tr], cfg, seed=0)
+                P["gbm"] = (gbm_proba(gb, X.iloc[va]), gbm_proba(gb, X.iloc[te]))
         for name, ext in external.items():
             P[name] = (_ext_probs(ext, name, fold.test_ward, "val", keys.iloc[va]),
                        _ext_probs(ext, name, fold.test_ward, "test", keys.iloc[te]))
 
-        member_names = [n for n in ("gbm", "spf", "xattn") if n in P] + [n for n in external if n != "xattn"]
+        member_names = [n for n in ("gbm", "spf", "xattn") if n in P]  # fusion members only (variants are reported, not fused)
         member_names = list(dict.fromkeys(n for n in member_names if n in P))
         weights_used: dict[str, dict] = {}
         if "fusion" in want_fusion:

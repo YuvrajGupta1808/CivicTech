@@ -6,7 +6,7 @@ import pandas as pd
 
 OUT = Path(__file__).resolve().parents[1] / "output"
 NAMES = {"m0": "M0 majority", "m1": "M1 RideScore LTS v1", "spf": "M2 SPF (neg. binomial)",
-         "gbm": "M3 gradient boosting", "xattn": "M4 OSM-DDOT cross-attention",
+         "gbm": "M3 gradient boosting", "xattn": "M4 OSM-DDOT cross-attention", "xattn_concat": "M4-concat (no cross-attention)",
          "fusion": "F fusion (fixed weights)", "fusion_equal": "F fusion (equal weights)",
          "fusion_valsel": "F fusion (val-selected weights)"}
 ORDER = list(NAMES)
@@ -38,7 +38,7 @@ def ladder_table(s):
 
 
 def decoder_table(s):
-    d = s[s.model.isin(["spf", "gbm", "xattn", "fusion"])]
+    d = s[s.model.isin(["spf", "gbm", "xattn", "xattn_concat", "fusion"])]
     piv = d.pivot(index="model", columns="decoder", values="macro_f1_mean")
     piv = piv.loc[[m for m in ORDER if m in piv.index]]
     return pd.DataFrame({"Model": [NAMES[m] for m in piv.index],

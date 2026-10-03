@@ -35,4 +35,11 @@
 - Notebooks became numbered scripts (`scripts/01` to `05`) because of the time limit.
 - Wording rule: "where crashes happen", never "danger per ride"; no exposure data exists.
 - Data outputs are ODbL (OSM-derived); code is MIT; DDOT and Crashes in DC are CC BY 4.0.
-- Sanity check: M0 should give about 91% accuracy and about 0.32 macro-F1; anything far from that means a label or split bug.
+- Sanity check: M0 gives 0.900 accuracy and 0.315 macro-F1 (fold mean); anything far from that means a label or split bug.
+- pandas 3 + sklearn 1.8: HistGradientBoosting with `categorical_features="from_dtype"` fails on `str`-dtype categories containing NA; `experiments._clean_features` recodes every categorical to integer categories.
+- GBM threads are capped at 8 (`threadpool_limits`); under CPU contention an uncapped fold took 400 s instead of 6 s.
+- M4 runs in the separate GPU env `/home/922933190/.conda/envs/avtca/bin/python` (torch + CUDA, no PyYAML), so its config values are hardcoded in `scripts/05_xattn.py`; it writes `output/xattn_probs.parquet`, which `02_ladder.py` picks up as an external model.
+- M4's best validation epoch is usually 3-8 of 40, so it overfits early; cross-attention did not beat concatenation (E8).
+- Production LTS v1 is computed once in `build.py` as `ref_lts` (a reference column, never a feature) using the `ridescore` package installed from git.
+- `OFFINTERSECTION` is in metres (checked against route measures); 15 m is the intersection cutoff for label variant B.
+- Ablations ran with `--fast` (first GBM fit only), so their "all features" base is 0.444, not the ladder's 3-fit 0.439.

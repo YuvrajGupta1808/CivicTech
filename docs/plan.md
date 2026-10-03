@@ -159,3 +159,13 @@ Meanwhile, Claude writes `features/build.py` and `scripts/01_build_dataset.py`, 
   - `scored == False` exactly for the 1,399 rows with `match_status == none`.
   - Levels are in {0, 1, 2} and scores in [0, 2].
 - Open `risk_map.png` and `surprise_map.png` and check by eye that they cover DC with no blank wards.
+
+## Outcome (2026-10-03, 14:30 EDT)
+
+- All waves finished by 14:30, ahead of the cut lines; M4 landed and is in the fusion.
+- E1: F (0.4 M4 + 0.4 M3 + 0.2 M2) macro-F1 0.456 ± 0.029, AUC 0.769, top-10% capture 0.435; M0 0.315; M1 LTS v1 0.283.
+- E3: thresholds beat argmax for SPF (+7.9 pts), GBM (+2.1) and F (+4.6).
+- E5/E6: network geometry is the strongest group; DDOT + net ≈ all; OSM + net is weaker on top-10% capture.
+- E7/E8: blanking DDOT costs more than blanking OSM; cross-attention ≈ concatenation.
+- H5 rejected: "looks safe, has crashes" sub-blocks are mostly mid-block.
+- Repo: https://github.com/YuvrajGupta1808/CivicTech (public). PR to ridescoredc-models was dropped by the user's decision.

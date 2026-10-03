@@ -1,16 +1,16 @@
 rank,street,from_street,to_street,nearest_int_streets,ward,crash_count,int_count,midblock_count,injury_count,mu,pred_thresholds,why_looks_safe,ref_lts,net_max_legs,length_m,weak_match,osm_name,dc_subblockkey
-1,1ST ST NW,Block Only,Block Only,K ST NW,6,9,1,8,7,0.1716,0,predicted level 0,4,4.0,134.9812,False,1st Street Northwest,d8330417ae55c6b8ee8fd671c5020601
-2,EASTERN AVE NE,Block Only,Block Only,SOUTHERN AVE NE,7,8,0,8,5,0.0544,0,predicted level 0,4,3.0,172.1955,False,Eastern Avenue Northeast,5adb19eb2d98034d8db4d771ef3048f6
-3,PARK RD NW,Block Only,Block Only,14TH ST NW / HOLMEAD PL NW,1,8,0,8,6,0.2678,0,predicted level 0,4,5.0,182.6346,False,Park Road Northwest,06a3ec7e78414666dfdf39cf10a0f2bc
-4,EAST BASIN DR SW,Block Only,Block Only,MAINE AVE SW,2,6,0,6,6,0.0448,0,predicted level 0,4,4.0,62.2104,True,Ohio Drive SW Cycletrack,72756bf15d4ca2ffc5b6d2deee2d29f4
-5,NEW YORK AVE NE,Block Only,Block Only,NEW YORK AVE NW,5,6,6,0,5,0.1472,0,predicted level 0,4,4.0,39.8585,False,New York Avenue Northwest,70840873a757da2fcc9052f92dbf73df
-6,M ST NW,Block Only,Block Only,9TH ST NW,2,6,5,1,2,0.1815,0,predicted level 0,2,4.0,86.8616,False,M Street Northwest,3159e5a2cb282bbd8e7b585503e04a63
-7,DUPONT CIR NW,Block Only,Block Only,,2,6,0,6,4,0.2235,0,predicted level 0,4,4.0,64.6714,False,Dupont Circle Northwest,08a5d12ab4da271f6add031a8a601097
-8,M ST NE,Block Only,Block Only,M ST NW / 1ST ST NE,6,6,0,6,5,0.3583,0,predicted level 0,4,4.0,263.5616,False,M Street Northeast,3a4d74ad322b006cb853ffb04188cd47
-9,NORTH CAPITOL ST BN,Block Only,Block Only,NEW YORK AVE NW / M ST NW,5,6,5,1,3,0.4297,0,predicted level 0,4,4.0,392.0262,False,North Capitol Street Northwest,ba505ddbbcdb1957aa8e320b66045e99
-10,T ST NW,Block Only,Block Only,9TH ST NW,1,5,0,5,4,0.1804,0,predicted level 0,2,4.0,43.2745,False,T Street Northwest,58843c77c7fdfd77d969bc6235458b37
-11,ALABAMA AVE SE,Block Only,Block Only,23RD ST SE,8,5,4,1,3,0.1805,0,predicted level 0,4,4.0,40.6095,False,Alabama Avenue Southeast,65353611857833c4363e1496c4855480
-12,R ST NW,Block Only,Block Only,14TH ST NW,2,5,0,5,4,0.3577,0,predicted level 0,2,4.0,49.8216,False,R Street Northwest,ebee12ad2d111b9a0984a082dd9921ba
-13,NEW YORK AVE NW,Block Only,Block Only,14TH ST NW / H ST NW,2,5,0,5,5,0.4193,0,predicted level 0,4,4.0,154.3158,False,New York Avenue Northwest,08a2fc36930d3eefb960ce9849635594
-14,RHODE ISLAND AVE NW,Block Only,Block Only,7TH ST NW,2,5,2,3,5,0.4196,0,predicted level 0,4,4.0,49.5715,False,Rhode Island Avenue Northwest,8925ee4dcf61783388fc26515fe630b4
-15,R ST NE,Block Only,Block Only,ECKINGTON PL NE,5,4,1,3,1,0.1375,0,predicted level 0,4,4.0,188.8025,False,R Street Northeast,4d3c2e2e698dec7504e583bbb1491e5c
+1,1ST ST NW,Block Only,Block Only,K ST NW,6,9,1,8,7,0.3178,0,predicted level 0,4,4.0,134.9812,False,1st Street Northwest,d8330417ae55c6b8ee8fd671c5020601
+2,EASTERN AVE NE,Block Only,Block Only,SOUTHERN AVE NE,7,8,0,8,5,0.2892,0,predicted level 0,4,3.0,172.1955,False,Eastern Avenue Northeast,5adb19eb2d98034d8db4d771ef3048f6
+3,EAST BASIN DR SW,Block Only,Block Only,MAINE AVE SW,2,6,0,6,6,0.0807,0,predicted level 0,4,4.0,62.2104,True,Ohio Drive SW Cycletrack,72756bf15d4ca2ffc5b6d2deee2d29f4
+4,DUPONT CIR NW,Block Only,Block Only,,2,6,0,6,4,0.2915,0,predicted level 0,4,4.0,64.6714,False,Dupont Circle Northwest,08a5d12ab4da271f6add031a8a601097
+5,M ST NE,Block Only,Block Only,M ST NW / 1ST ST NE,6,6,0,6,5,0.3649,0,predicted level 0,4,4.0,263.5616,False,M Street Northeast,3a4d74ad322b006cb853ffb04188cd47
+6,NEW YORK AVE NE,Block Only,Block Only,NEW YORK AVE NW,5,6,6,0,5,0.3679,0,predicted level 0,4,4.0,39.8585,False,New York Avenue Northwest,70840873a757da2fcc9052f92dbf73df
+7,NORTH CAPITOL ST BN,Block Only,Block Only,NEW YORK AVE NW / M ST NW,5,6,5,1,3,0.3797,0,predicted level 0,4,4.0,392.0262,False,North Capitol Street Northwest,ba505ddbbcdb1957aa8e320b66045e99
+8,M ST NW,Block Only,Block Only,9TH ST NW,2,6,5,1,2,0.4521,0,predicted level 0,2,4.0,86.8616,False,M Street Northwest,3159e5a2cb282bbd8e7b585503e04a63
+9,T ST NW,Block Only,Block Only,9TH ST NW,1,5,0,5,4,0.2558,0,predicted level 0,2,4.0,43.2745,False,T Street Northwest,58843c77c7fdfd77d969bc6235458b37
+10,ALABAMA AVE SE,Block Only,Block Only,23RD ST SE,8,5,4,1,3,0.2966,0,predicted level 0,4,4.0,40.6095,False,Alabama Avenue Southeast,65353611857833c4363e1496c4855480
+11,R ST NW,Block Only,Block Only,14TH ST NW,2,5,0,5,4,0.492,0,predicted level 0,2,4.0,49.8216,False,R Street Northwest,ebee12ad2d111b9a0984a082dd9921ba
+12,R ST NE,Block Only,Block Only,ECKINGTON PL NE,5,4,1,3,1,0.3053,0,predicted level 0,4,4.0,188.8025,False,R Street Northeast,4d3c2e2e698dec7504e583bbb1491e5c
+13,23RD ST NW,Block Only,Block Only,P ST NW,2,4,0,4,3,0.3541,0,predicted level 0,4,4.0,118.7927,False,23rd Street Northwest,5c6fd2c545173dfdbc0706dffb4593b9
+14,E ST SE,Block Only,Block Only,11TH ST SE,6,4,0,4,3,0.3624,0,predicted level 0,2,4.0,111.5088,False,E Street Southeast,21ace074799d3e27e213b38b5bcbc115
+15,17TH ST NW,Block Only,Block Only,Q ST NW,2,4,0,4,4,0.3898,0,predicted level 0,2,4.0,45.5998,False,17th Street Northwest,00420777911ffe33f665ce4ea0fcdcdf
