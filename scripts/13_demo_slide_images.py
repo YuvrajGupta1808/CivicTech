@@ -61,80 +61,67 @@ def image(fig, path, rect):
     ax.axis("off")
 
 
+def bullets(ax, x, y, items, width, size=17, gap=3.4):
+    for item in items:
+        lines = textwrap.wrap(item, width)
+        ax.text(x, y, "•", fontsize=size, color=GOLD, weight="bold", va="top")
+        for line in lines:
+            ax.text(x + 3, y, line, fontsize=size, color=INK, va="top")
+            y -= gap
+        y -= 1.4
+    return y
+
+
 def slide1():
     fig, ax = frame("Does street design explain where DC cyclists crash?",
                     "Yuvraj Gupta  ·  github.com/YuvrajGupta1808/CivicTech")
-    y = heading(ax, 6, 79, "Why it matters")
+    y = heading(ax, 6, 76, "Why it matters")
     y = para(ax, 6, y, "RideScore colours DC streets by design (LTS, BNA). Nobody had checked "
-                       "those colours against where cyclists actually crash. If they don't match, "
-                       "the map shows comfort, not crash risk.", 50)
-    y = heading(ax, 6, y - 1.5, "Hypotheses")
-    hyps = [("H1", "Design predicts crash locations, but only modestly"),
-            ("H2", "Junctions, lanes and traffic matter more than bike-lane type"),
-            ("H3", "DDOT data is more useful than OSM"),
-            ("H4", "Ordinal decoding (from AVB-Engage) helps find rare repeat-crash blocks"),
-            ("H5", "Streets that look safe but crash are mostly at intersections")]
-    for hid, text in hyps:
-        ax.text(6, y, hid, fontsize=16, color=GOLD, weight="bold", va="top")
-        y = para(ax, 13, y, text, 44, gap=3.1) - 0.3
-    ax.text(72, 79, "What we built", fontsize=20, color=NAVY, weight="bold", va="top")
-    image(fig, ROOT / "docs/architecture.png", [0.375, 0.255, 0.605, 0.47])
-    tiles = [("3,089", "DC bike crashes, 2021-26"), ("19,554", "DDOT street blocks"),
-             ("57", "street-design features"), ("8 wards", "each tested unseen")]
-    for i, (big, small) in enumerate(tiles):
-        tile(ax, 72 + i * 29, 8, 26.5, 15, big, small)
+                       "those colours against where cyclists actually crash.", 44, size=17, gap=3.5)
+    y = heading(ax, 6, y - 2, "What we did")
+    bullets(ax, 6, y, ["Joined 3,089 DC bike crashes (2021-26) to 19,554 DDOT street blocks",
+                       "57 street-design facts from OpenStreetMap + DDOT",
+                       "3 models, incl. OSM-DDOT cross-attention from AVB-Engage, fused",
+                       "Tested only on wards the model never saw"], 40)
+    image(fig, ROOT / "docs/architecture.png", [0.33, 0.12, 0.655, 0.62])
     ax.text(6, 3, "Data: © OpenStreetMap contributors (ODbL); DDOT, MPD Crashes in DC (CC BY 4.0).",
             fontsize=12, color=MUTED, va="center")
-    fig.savefig(ROOT / "slides/demo_v2_slide1.png", dpi=100, facecolor="white")
+    fig.savefig(ROOT / "slides/demo_v3_slide1.png", dpi=100, facecolor="white")
 
 
 def slide2():
-    fig, ax = frame("What we found: design finds crash streets, comfort scores don't")
-    ax.text(6, 84.5, "Held-out wards only. Share of a ward's bike crashes in the 10% of blocks "
-                     "each score rates worst:", fontsize=16, color=MUTED, va="center")
+    fig, ax = frame("What we found: comfort scores don't show where cyclists crash")
+    image(fig, ROOT / "output/lts_disagreement_map.png", [0.02, 0.04, 0.40, 0.75])
+    x = 86
+    ax.text(x, 80, "Share of crashes in the 10% of blocks each score rates worst",
+            fontsize=17, color=NAVY, weight="bold", va="top")
+    ax.text(x, 75.5, "(wards the model never saw)", fontsize=14, color=MUTED, va="top")
     bars = [("Random", 10, "#9CA3AF"), ("LTS", 13, "#6B8BB5"), ("BNA", 18, "#6B8BB5"),
             ("Our model", 44, ACCENT)]
     for i, (name, val, col) in enumerate(bars):
-        yy = 76 - i * 6.2
-        ax.text(6, yy, name, fontsize=17, color=INK, va="center", weight="bold")
-        ax.add_patch(FancyBboxPatch((26, yy - 2.1), val * 1.45, 4.2,
+        yy = 67.5 - i * 5.6
+        ax.text(x, yy, name, fontsize=16, color=INK, va="center", weight="bold")
+        ax.add_patch(FancyBboxPatch((x + 20, yy - 1.9), val * 1.55, 3.8,
                                     boxstyle="round,pad=0,rounding_size=0.6", fc=col, ec="none"))
-        ax.text(26 + val * 1.45 + 1.5, yy, f"{val}%", fontsize=18, color=col, weight="bold",
+        ax.text(x + 20 + val * 1.55 + 1.5, yy, f"{val}%", fontsize=17, color=col, weight="bold",
                 va="center")
-    y = heading(ax, 6, 49, "Hypotheses: what held")
-    rows = [("H1", "Supported", GREEN, "Clearly above chance; recall of 2+ crash blocks still only 32%"),
-            ("H2", "Partly", AMBER, "Junction layout and lanes matter most; bike-lane type alone barely"),
-            ("H3", "Supported", GREEN, "DDOT slightly ahead of OSM; cross-attention ≈ simple concat"),
-            ("H4", "Supported", GREEN, "Ordinal thresholds add +4.6 macro-F1 points to the fused model"),
-            ("H5", "Rejected", RED, "79% of their crashes are mid-block, not at intersections")]
-    for hid, verdict, col, text in rows:
-        ax.text(6, y, hid, fontsize=16, color=GOLD, weight="bold", va="top")
-        ax.text(13, y, verdict, fontsize=16, color=col, weight="bold", va="top")
-        y = para(ax, 34, y, text, 48, gap=3.1) - 0.6
-    x = 106
-    ax.add_patch(FancyBboxPatch((x - 3, 6), 83, 78, boxstyle="round,pad=0,rounding_size=1.5",
-                                fc=TILE, ec="none"))
-    y = heading(ax, x, 81, "Key evidence")
-    y = para(ax, x, y, "LTS's calmest streets (LTS 1) have the most crashes per km: 6.5 vs 0.85 "
-                       "for LTS 2. Worst block in DC: 14th St NW at Irving St, LTS 1 with a "
-                       "protected lane, 18 crashes in 5 years. Crashes follow riders.", 52)
-    y = heading(ax, x, y - 1, "Where we are")
-    y = para(ax, x, y, "Risk level + score for all 28,978 street segments, risk and "
-                       "disagreement maps, interactive web map, code and tests on GitHub.", 52)
-    y = heading(ax, x, y - 1, "Next")
-    for item in ["Show a crash layer next to LTS, not instead of it",
-                 "Add bike counts to separate busy from dangerous",
-                 "Fix Ward 7-8 crash matching (about 20% lost)"]:
-        y = para(ax, x, y, "•  " + item, 52, gap=3.1)
-    y = heading(ax, x, y - 1, "Honest limit")
-    para(ax, x, y, "No ridership data: this shows where crashes happen, not danger per ride.", 52)
+    y = heading(ax, x, 44, "Key evidence")
+    y = bullets(ax, x, y, ["Orange streets: LTS calls them calm, our model flags them. 4% of the "
+                           "network, 15% of all bike crashes",
+                           "Worst block: 14th St NW at Irving St. LTS 1, protected lane, 18 crashes"],
+                52, size=16, gap=3.2)
+    y = heading(ax, x, y - 0.5, "Next")
+    y = bullets(ax, x, y, ["Crash layer next to LTS, not instead of it",
+                           "Bike counts to separate busy from dangerous"], 52, size=16, gap=3.2)
+    ax.text(x, y - 0.5, "Limit: no ridership data, so this shows where crashes happen, "
+            "not danger per ride.", fontsize=14, color=MUTED, va="top", style="italic")
     ax.text(6, 3, "github.com/YuvrajGupta1808/CivicTech  ·  © OpenStreetMap contributors (ODbL); "
                   "DDOT, MPD (CC BY 4.0)", fontsize=12, color=MUTED, va="center")
-    fig.savefig(ROOT / "slides/demo_v2_slide2.png", dpi=100, facecolor="white")
+    fig.savefig(ROOT / "slides/demo_v3_slide2.png", dpi=100, facecolor="white")
 
 
 if __name__ == "__main__":
     (ROOT / "slides").mkdir(exist_ok=True)
     slide1()
     slide2()
-    print("wrote slides/demo_v2_slide1.png, slides/demo_v2_slide2.png")
+    print("wrote slides/demo_v3_slide1.png, slides/demo_v3_slide2.png")
