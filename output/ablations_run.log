@@ -1,3 +1,10 @@
-[abl] 19554 sub-blocks, 57 features (57 in groups), runs=['e10', 'e11', 'e5', 'e6'], gbm fits=3, jobs=6, OMP_NUM_THREADS=2
+[abl] --fast: cfg['gbm']['fits'] trimmed to the first fit only
+[abl] 19554 sub-blocks, 57 features (57 in groups), runs=['e10', 'e11', 'e5', 'e6'], gbm fits=1, jobs=6, OMP_NUM_THREADS=2
 [abl] block-level: 13068 blocks (longest sub-block's features; 490 NaN-key sub-blocks dropped)
 [abl] E11: dropping 100 weak_match rows
+[abl] e5:bike                      cols=42 rows=19554 F1=0.440 AUCany=0.739 AUCrep=0.815 top10=0.399 (61s)
+[abl] e5:lanes_width               cols=47 rows=19554 F1=0.419 AUCany=0.734 AUCrep=0.819 top10=0.400 (70s)
+[abl] e5:traffic                   cols=54 rows=19554 F1=0.432 AUCany=0.748 AUCrep=0.841 top10=0.418 (71s)
+[abl] base                         cols=57 rows=19554 F1=0.444 AUCany=0.744 AUCrep=0.829 top10=0.414 (76s)
+[abl] e5:speed                     cols=55 rows=19554 F1=0.438 AUCany=0.742 AUCrep=0.832 top10=0.419 (76s)
+[abl] e5:parking                   cols=54 rows=19554 F1=0.431 AUCany=0.744 AUCrep=0.837 top10=0.403 (78s)
