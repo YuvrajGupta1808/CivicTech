@@ -22,6 +22,7 @@ Two slides for the shared demo deck. All numbers come from `output/` (see README
 - Biggest feature group: network geometry (intersection legs, junction density), then lanes/width; bike-facility type alone is within noise. DDOT vs OSM: DDOT carries a bit more than OSM (macro-F1 0.429 vs 0.411); together 0.444; cross-attention gives no gain over plain concatenation.
 
 **Figures** (left to right)
+- `docs/architecture.png`: one-line pipeline (data → table → 3 models → fusion + decoding → outputs)
 - `output/ladder.png`: model ladder M0 to F with sd bars (E1)
 - `output/ablation.png`: drop-one feature-group ablation (E5)
 - `output/risk_map.png`: out-of-fold expected level, green to red

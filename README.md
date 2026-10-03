@@ -38,6 +38,8 @@ Crashes are never used as features. They give the label and nothing else.
 
 ## Method
 
+![architecture](docs/architecture.png)
+
 | Step | Choice |
 |---|---|
 | Unit | DDOT sub-block. The 28,978 snapshot segments collapse to **19,554 sub-blocks**; `dc_*` values are constant inside one. |

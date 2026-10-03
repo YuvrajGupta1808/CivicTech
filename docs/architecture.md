@@ -4,50 +4,25 @@ Pipeline from the RideScore DC snapshot and the Crashes in DC layer to the hand-
 
 ## Pipeline
 
+![architecture](architecture.png)
+
+Regenerate the figure with `.venv/bin/python scripts/09_architecture_figure.py` (writes `architecture.png` and `architecture.svg`).
+
 ```mermaid
-flowchart TD
-    SNAP["RideScore DC snapshot 2026-09-29<br/>28,978 segments"]
-    CR["Crashes in DC layer 24<br/>3,089 bike crashes, 5-year window"]
-
-    SNAP --> LS["load_snapshot<br/>keys lower-cased, seg_length_m"]
-    CR --> FC["fetch_crashes<br/>cached Parquet, subblockkey, near_int"]
-
-    LS --> FEAT["features: ddot_, osmf_, net_<br/>11 groups in groups.py"]
-    LS --> LAB["build_labels<br/>count per sub-block, level 0 / 1 / 2+"]
-    FC --> LAB
-
-    FEAT --> TAB["sub-block table<br/>19,554 rows, features + labels + ward"]
-    LAB --> TAB
-
-    TAB --> FOLDS["ward_folds: leave-one-ward-out<br/>test w, validation next 2, train 5"]
-
-    FOLDS --> M0["M0 majority"]
-    FOLDS --> M1["M1 production LTS v1"]
-    FOLDS --> M2["M2 negative-binomial SPF"]
-    FOLDS --> M3["M3 gradient boosting<br/>weights 1/sqrt count"]
-    FOLDS --> M4["M4 OSM-DDOT cross-attention<br/>GPU, avtca env"]
-
-    M2 --> FUSE["F: fixed-weight late fusion<br/>0.4 M4 + 0.4 M3 + 0.2 M2"]
-    M3 --> FUSE
-    M4 --> FUSE
-
-    M0 --> DEC["decode: expected level mu<br/>thresholds fitted on validation wards"]
-    M1 --> DEC
-    M2 --> DEC
-    M3 --> DEC
-    FUSE --> DEC
-
-    DEC --> MET["evaluate: metrics per fold<br/>mean +- sd vs M0"]
-    DEC --> OOF["out-of-fold predictions<br/>one per sub-block"]
-
-    MET --> E1["E1 ladder, E3 decoders, E9 fusion weights"]
-    TAB --> ABL["ablations: E5 groups, E6 DDOT vs OSM,<br/>E10 label variants, E11 weak matches"]
-    OOF --> FIND["findings: surprise groups,<br/>breakdowns, risk map, surprise map"]
-    FIND --> HAND["output/crash_risk_by_segment.parquet"]
-    E1 --> OUT["output/ CSV + PNG"]
-    ABL --> OUT
-    FIND --> OUT
+flowchart LR
+    OSM["OpenStreetMap"] --> T["Sub-block table<br/>19,554 rows, 57 features,<br/>label 0 / 1 / 2+"]
+    DDOT["DDOT SubBlock"] --> T
+    CR["Crashes in DC<br/>3,089 bike crashes"] --> T
+    T --> M2["M2 SPF"]
+    T --> M3["M3 GBM"]
+    T --> M4["M4 OSM-DDOT<br/>cross-attention"]
+    M2 --> F["Fusion 0.4 / 0.4 / 0.2<br/>+ ordinal decoding"]
+    M3 --> F
+    M4 --> F
+    F --> O["Risk per segment, maps,<br/>checks vs majority, LTS, BNA"]
 ```
+
+All arrows run inside leave-one-ward-out cross-validation: train on 5 wards, fit thresholds and fusion weights on 2, test on 1. M0 (majority), M1 (RideScore LTS v1) and BNA are reference scores evaluated on the same folds.
 
 Leakage guard: ward, coordinates and crash-derived values never enter `FEAT`; thresholds and fusion weights are fitted on validation wards only.
 
@@ -73,7 +48,7 @@ Leakage guard: ward, coordinates and crash-derived values never enter `FEAT`; th
 | Fusion | `src/models/fusion.py` | `fuse(...)` and the weight grid for E9 |
 | Cross-attention | `src/models/xattn.py` | M4: tokeniser, OSM<->DDOT cross-attention, concat variant |
 | Experiment runner | `src/experiments.py` | `run_cv(...)`: per-fold metrics and OOF predictions for all decoders |
-| Scripts | `scripts/01_build_dataset.py` to `05_xattn.py` | Build table; ladder (E1, E3, E9); ablations (E5, E6, E10, E11); findings and hand-in; M4 (E7, E8) |
+| Scripts | `scripts/01_build_dataset.py` to `09_architecture_figure.py` | Build table; ladder (E1, E3, E9); ablations (E5, E6, E10, E11); findings and hand-in; M4 (E7, E8); tables; BNA comparison; LTS disagreement map; this figure |
 | Tests | `tests/test_labels.py`, `test_osm_parsing.py`, `test_decode.py`, `test_split.py` | Unit tests on synthetic tables |
 
 ## Key interfaces
