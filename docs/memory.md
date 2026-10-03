@@ -46,3 +46,4 @@
 - BNA is computed with the team's `bikescore-bna` 0.2.0 (git 6a6cb494) segment-stress rules only (`default_segment_stress_rules()`); intersection stress needs the node graph and is not used. Inputs are DDOT first, then OSM, then BNA per-class defaults.
 - Binary scores (BNA, LTS-coarse) are compared with AUC and top-10% capture only; macro-F1 is not comparable to the 3-class models.
 - The LTS disagreement cells use LTS ≤ 2 vs ≥ 3 and fusion out-of-fold level 0 vs ≥ 1; in both disagreement cells the crash record sides with the model.
+- Fairness check (scripts/10): GBM on LTS's 4 raw facts reaches AUC 0.706 / top-10% 36% vs LTS as-is 0.623 / 18%; re-weighting only the LTS level gives 0.642 / 20%. Most of the gain is from crash-weighted combination of the same facts.

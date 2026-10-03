@@ -205,6 +205,20 @@ BNA and LTS agree on 81% of sub-blocks (79% of km). Most of the disagreement is 
 
 ![BNA vs LTS vs model](output/bna_compare.png)
 
+**Fairness check: is the gain only because our model learned from crashes?** (`scripts/10_lts_inputs_test.py`). The same GBM and the same held-out wards, with different inputs:
+
+| Inputs (GBM trained on crashes) | Inputs | Macro-F1 | AUC any crash | Top-10% capture |
+|---|---|---|---|---|
+| RideScore LTS v1 as-is (no training, M1) | – | 0.283 | 0.623 | 0.178 |
+| BNA stress as-is (no training) | – | – | 0.647 | 0.182 |
+| LTS level only, re-weighted by crashes | 1 | 0.338 ± 0.016 | 0.642 ± 0.043 | 0.203 |
+| BNA stress only, re-weighted by crashes | 1 | 0.307 ± 0.024 | 0.647 ± 0.060 | 0.182 |
+| LTS's own raw facts (speed, lanes, bike facility, road class) | 4 | 0.398 ± 0.018 | 0.706 ± 0.043 | 0.357 |
+| LTS's raw facts + junction / network geometry | 11 | 0.406 ± 0.025 | 0.737 ± 0.027 | 0.370 |
+| All 57 design facts (M3) | 57 | 0.439 ± 0.028 | 0.743 ± 0.032 | 0.414 |
+
+Most of the gap (top-10% capture rises from 18% to 36%) comes from combining **the same four facts LTS already uses**, but weighted by crash data instead of by comfort rules. Re-learning only LTS's final 1-4 level barely helps (18% to 20%), because squeezing a street into 4 boxes throws the detail away. Junction geometry and the other facts add the rest (36% to 41%, and 44% for the fusion). So yes, learning from crashes is the main reason. LTS's inputs carry crash information; its rule just combines them for a different purpose (comfort).
+
 **Per ward:**
 
 | Test ward | Sub-blocks | Level-2 | Macro-F1 | AUC any | Top-10% capture |
@@ -275,6 +289,7 @@ python scripts/05_xattn.py                     # M4, E7, E8 (GPU env; writes out
 .venv/bin/python scripts/07_bna.py             # BNA stress vs LTS vs model
 .venv/bin/python scripts/08_lts_disagreement.py  # LTS vs model disagreement map + interactive risk_map.html
 .venv/bin/python scripts/09_architecture_figure.py  # docs/architecture.png
+.venv/bin/python scripts/10_lts_inputs_test.py   # fairness check: LTS inputs re-weighted by crashes
 
 .venv/bin/python -m pytest -q
 ```
