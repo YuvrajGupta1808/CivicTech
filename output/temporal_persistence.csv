@@ -1,0 +1,11 @@
+,value
+crashes_early,947.0
+crashes_late,1795.0
+p_late_given_early,0.39176626826029215
+p_late_given_no_early,0.051858943673208875
+late_share_on_no_early_subblocks,0.6863509749303621
+hot_spots_early_ge2,125.0
+hot_spots_with_no_late_crash,0.272
+hot_cooled_no_bike_facility_now,0.7058823529411765
+hot_stayed_no_bike_facility_now,0.4835164835164835
+spearman_early_late,0.271406202798927

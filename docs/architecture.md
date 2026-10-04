@@ -48,7 +48,7 @@ Leakage guard: ward, coordinates and crash-derived values never enter `FEAT`; th
 | Fusion | `src/models/fusion.py` | `fuse(...)` and the weight grid for E9 |
 | Cross-attention | `src/models/xattn.py` | M4: tokeniser, OSM<->DDOT cross-attention, concat variant |
 | Experiment runner | `src/experiments.py` | `run_cv(...)`: per-fold metrics and OOF predictions for all decoders |
-| Scripts | `scripts/01_build_dataset.py` to `09_architecture_figure.py` | Build table; ladder (E1, E3, E9); ablations (E5, E6, E10, E11); findings and hand-in; M4 (E7, E8); tables; BNA comparison; LTS disagreement map; this figure |
+| Scripts | `scripts/01_build_dataset.py` to `14_temporal_check.py` | Build table; ladder (E1, E3, E9); ablations (E5, E6, E10, E11); findings and hand-in; M4 (E7, E8); tables; BNA comparison; LTS disagreement map; this figure; LTS-inputs fairness check; head-to-head; demo slides and images; temporal check (early vs late crashes) |
 | Tests | `tests/test_labels.py`, `test_osm_parsing.py`, `test_decode.py`, `test_split.py` | Unit tests on synthetic tables |
 
 ## Key interfaces

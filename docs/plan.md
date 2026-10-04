@@ -170,3 +170,18 @@ Meanwhile, Claude writes `features/build.py` and `scripts/01_build_dataset.py`, 
 - H5 rejected: "looks safe, has crashes" sub-blocks are mostly mid-block.
 - Repo: https://github.com/YuvrajGupta1808/CivicTech (public). PR to ridescoredc-models was dropped by the user's decision.
 - Added after the first push (14:40–14:45): BNA comparison (`scripts/07_bna.py`), LTS disagreement map and interactive `output/risk_map.html` (`scripts/08_lts_disagreement.py`), simplified architecture figure (`scripts/09_architecture_figure.py`), and a challenge-coverage table in the README.
+
+## Is crash data the right target? (2026-10-03, after the hackathon)
+
+- **Question raised:** crashes are historical, while streets keep changing, and crashes only show what happened to people who already ride there. Is a crash count the right thing to predict?
+- **Position:** crashes stay the outcome we validate against, because they are the only record of actual harm. They are not used as a hot-spot list. The model learns which designs go with recorded crashes from the current snapshot, so its score changes as soon as the snapshot records a redesign, without waiting years for new crashes.
+- **Evidence (`scripts/14_temporal_check.py`, `output/temporal_check.csv`):** see the temporal-check entry in memory.md. In short, the design model trained on early crashes holds up on late crashes, while raw crash history does not.
+- **Known biases we cannot yet measure:**
+  - Features are from 2026 but labels span 2021-26, so a street redesigned mid-window carries its pre-redesign crashes. Lanes are often built where crashes were, which would make new protection look risky.
+  - There is no exposure data, so streets people avoid look safe.
+  - Police reports miss some bike crashes.
+- **Next steps, in order:**
+  1. Exposure: crashes per ride, from counters or Capital Bikeshare.
+  2. Install dates: drop crashes that happened before a street's last redesign.
+  3. Empirical Bayes: blend the model with each street's own count (design + history reached 0.764 / 0.445).
+  4. Leading indicators that change the day a street does: speeds and near-miss reports.

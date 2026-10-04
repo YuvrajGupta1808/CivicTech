@@ -1,0 +1,8 @@
+scored_on,predictor,auc_any_mean,auc_any_std,top10_capture_count_mean,top10_capture_count_std
+late,"design, trained on early",0.727,0.019,0.403,0.069
+late,"design, trained on late",0.759,0.025,0.404,0.04
+late,"design + history, trained on late",0.764,0.021,0.445,0.075
+late,history only,0.579,0.042,0.288,0.11
+late,LTS v1,0.614,0.061,0.171,0.046
+late,length only,0.617,0.038,0.154,0.043
+early,"design, trained on early",0.73,0.053,0.369,0.11

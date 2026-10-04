@@ -26,5 +26,5 @@
 |---|---|
 | Add exposure (bike counts, Capital Bikeshare trips) | Separate where people ride from where it is dangerous |
 | Recover Ward 7-8 crashes that miss the snapshot | Equity: about a fifth of their located crashes are unmatched |
-| Temporal validation (train early years, test late) | Wards are not the only shift; crashes rose 2022-2025 |
+| Temporal validation (train early years, test late) | First pass done (`scripts/14_temporal_check.py`): a model trained on 2021-24 crashes ranks 2024-26 crashes as well as its own period (AUC 0.727 vs 0.730). Still open: thresholds and macro-F1 in time, and a before/after on streets redesigned in the window (needs install dates, which DC's bike-lane layer lacks) |
 | Full 3-fit ablations (no `--fast`) | E5 deltas are near the noise floor |
